@@ -10,9 +10,10 @@ import { useRouter } from 'next/navigation';
 
 export default function BlockPage() {
   const [folders, setFolders] = useState([
-    { id: 1, name: 'Mathematics', notes: ['Algebra', 'Geometry', 'Calculus'] },
-    { id: 2, name: 'Science', notes: ['Biology', 'Chemistry', 'Physics'] },
-    { id: 3, name: 'Literature', notes: ['Shakespeare', 'Poetry', 'Novel Analysis'] },
+    { id: 1, name: 'Hindi', notes: ['Lecture-1', 'Lecture-2', 'Lecture-3'] },
+    { id: 2, name: 'English', notes: ['Lecture-1', 'Lecture-2', 'Lecture-3'] },
+    { id: 3, name: 'Portugese', notes: ['Lecture-1', 'Lecture-2', 'Lecture-3'] },
+    { id: 3, name: 'French', notes: ['Lecture-1', 'Lecture-2', 'Lecture-3'] },
   ])
 
   const router = useRouter();
