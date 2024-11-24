@@ -94,7 +94,11 @@ export default function BlockPage() {
     
     const sendRecognizedTextToServer = async (recognizedText) => {
       try {
+<<<<<<< HEAD
         const response = await fetch('https://1a8b-34-74-80-250.ngrok-free.app/data', {
+=======
+        const response = await fetch('https://1883-35-184-246-210.ngrok-free.app/data', {
+>>>>>>> 4948e3c696002c7193e771ee0b4e7135a8384419
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -302,12 +306,17 @@ export default function BlockPage() {
             <h2 className="text-xl font-semibold">Recognized Text</h2>
             <Button variant="outline" size="sm" onClick={toggleEditing}>
               <Edit2 className="h-4 w-4 mr-2" />
+<<<<<<< HEAD
               {isEditing ? 'View' : 'Ask Ai'}
             </Button>
             {/* <Button variant="outline" size="sm" onClick={toggleEditing}>
               <Edit2 className="h-4 w-4 mr-2" />
               {isEditing ? 'View' : 'Edit'}
             </Button> */}
+=======
+              {isEditing ? 'View' : 'Edit'}
+            </Button>
+>>>>>>> 4948e3c696002c7193e771ee0b4e7135a8384419
           </div>
           <div className="p-4 h-full overflow-hidden">
             {isEditing ? (
