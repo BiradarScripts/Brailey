@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - BrailleScribe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6C63FF;
+            --secondary-color: #FF6584;
+            --text-color: #F8F8F8;
+            --bg-color: #0A0E17;
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(108, 99, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 101, 132, 0.1) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--text-color) 0%, var(--secondary-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-bar {
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            color: var(--text-color);
+            width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 10px rgba(255, 101, 132, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 101, 132, 0.3);
+        }
+
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .subject-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            text-decoration: none;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subject-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.1), rgba(255, 101, 132, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(108, 99, 255, 0.1);
+        }
+
+        .subject-card:hover::before {
+            opacity: 1;
+        }
+
+        .subject-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .subject-card:hover .subject-icon {
+            transform: scale(1.1);
+        }
+
+        .math { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); }
+        .science { background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); }
+        .literature { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
+        .history { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
+        .art { background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%); }
+
+        .subject-info {
+            flex: 1;
+        }
+
+        .subject-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .subject-count {
+            color: #a1a1a1;
+            font-size: 1rem;
+        }
+
+        .back-to-home {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-color);
+            padding: 1rem;
+            border-radius: 50%;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .back-to-home:hover {
+            transform: translateY(-3px) rotate(360deg);
+            box-shadow: 0 8px 20px rgba(255, 101, 132, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .search-bar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>BrailleScribe Dashboard</h1>
+            <input type="search" placeholder="Search subjects..." class="search-bar">
+            <a href="new-subject.html" class="btn">+ New Subject</a>
+        </header>
+
+        <main class="subject-grid">
+            <a href="notes.html?subject=math" class="subject-card">
+                <div class="subject-icon math">📐</div>
+                <div class="subject-info">
+                    <div class="subject-name">Mathematics</div>
+                    <div class="subject-count">12 notes</div>
+                </div>
+            </a>
+            <a href="notes.html?subject=science" class="subject-card">
+                <div class="subject-icon science">🧪</div>
+                <div class="subject-info">
+                    <div class="subject-name">Science</div>
+                    <div class="subject-count">8 notes</div>
+                </div>
+            </a>
+            <a href="notes.html?subject=literature" class="subject-card">
+                <div class="subject-icon literature">📚</div>
+                <div class="subject-info">
+                    <div class="subject-name">Literature</div>
+                    <div class="subject-count">15 notes</div>
+                </div>
+            </a>
+            <a href="notes.html?subject=history" class="subject-card">
+                <div class="subject-icon history">🏛️</div>
+                <div class="subject-info">
+                    <div class="subject-name">History</div>
+                    <div class="subject-count">10 notes</div>
+                </div>
+            </a>
+            <a href="notes.html?subject=art" class="subject-card">
+                <div class="subject-icon art">🎨</div>
+                <div class="subject-info">
+                    <div class="subject-name">Art</div>
+                    <div class="subject-count">6 notes</div>
+                </div>
+            </a>
+        </main>
+    </div>
+    <a href="index.html" class="back-to-home" title="Back to Home">🏠</a>
+</body>
+</html>
+
