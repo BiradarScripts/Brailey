@@ -1,0 +1,160 @@
+from flask import Flask, jsonify, request, render_template_string
+from pyngrok import ngrok
+from flask_cors import CORS
+import serial
+
+# Set your ngrok authentication token
+ngrok.set_auth_token('2lzFTKGguCaQnvqkBnScBWcsxAP_4srWnM1hngHbUPyDLQcw')
+
+# Initialize Flask app
+app = Flask(__name__)
+CORS(app)
+
+# Global variables
+recognized_text = ""
+
+# Initialize serial connection
+arduino_port = "COM3"  # Replace with your Arduino's COM port
+baud_rate = 9600       # Replace with your Arduino's baud rate
+try:
+    arduino = serial.Serial(arduino_port, baud_rate, timeout=1)
+    print(f"Connected to Arduino on {arduino_port}")
+except serial.SerialException as e:
+    arduino = None
+    print(f"Failed to connect to Arduino: {e}")
+
+# HTML template
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recognized Text Viewer</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #74ebd5, #9face6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            text-align: center;
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin: 0 0 20px;
+            color: #555;
+        }
+
+        .recognized-text {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #333;
+            min-height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            white-space: pre-wrap; /* Preserves whitespace and line breaks */
+        }
+
+        footer {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            animation: fadeIn 1s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Recognized Text Viewer</h1>
+        <div class="recognized-text" id="recognizedText">Loading...</div>
+        <footer>Updated dynamically every 2 seconds</footer>
+    </div>
+    <script>
+        async function fetchRecognizedText() {
+            try {
+                const response = await fetch('/get-recognized-text');
+                const data = await response.json();
+                document.getElementById('recognizedText').textContent = data.recognized_text || "No text available.";
+            } catch (error) {
+                console.error("Error fetching recognized text:", error);
+                document.getElementById('recognizedText').textContent = "Error loading text.";
+            }
+        }
+
+        setInterval(fetchRecognizedText, 2000);
+        fetchRecognizedText();
+    </script>
+</body>
+</html>
+"""
+
+@app.route('/')
+def home():
+    return render_template_string(HTML_TEMPLATE)
+
+@app.route('/get-recognized-text', methods=['GET'])
+def get_recognized_text():
+    global recognized_text
+    return jsonify({"recognized_text": recognized_text}), 200
+
+@app.route('/data', methods=['POST'])
+def receive_data():
+    global recognized_text
+    data = request.get_json()
+    recognized_text = data.get('recognizedText', '')
+    print(f"Received recognized text: {recognized_text}")
+    return jsonify({"message": "Recognized text received successfully!", "received_text": recognized_text}), 200
+
+@app.route('/send-to-arduino', methods=['POST'])
+def send_to_arduino():
+    global recognized_text
+    if arduino:
+        try:
+            arduino.write(recognized_text.encode('utf-8'))
+            return jsonify({"message": "Data sent to Arduino successfully!"}), 200
+        except serial.SerialException as e:
+            return jsonify({"message": "Failed to send data to Arduino", "error": str(e)}), 500
+    else:
+        return jsonify({"message": "Arduino is not connected"}), 500
+
+# Start ngrok
+public_url = ngrok.connect(5000)
+print(f"Flask app is publicly accessible at: {public_url}")
+
+# Run Flask app
+app.run(port=5000)
