@@ -73,7 +73,23 @@ HTML_TEMPLATE = """
             display: flex;
             justify-content: center;
             align-items: center;
-            white-space: pre-wrap; /* Preserves whitespace and line breaks */
+            white-space: pre-wrap;
+        }
+
+        .btn-send {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .btn-send:hover {
+            background: #0056b3;
         }
 
         footer {
@@ -102,6 +118,7 @@ HTML_TEMPLATE = """
     <div class="container">
         <h1>Recognized Text Viewer</h1>
         <div class="recognized-text" id="recognizedText">Loading...</div>
+        <button class="btn-send" onclick="sendToArduino()">Send to Arduino</button>
         <footer>Updated dynamically every 2 seconds</footer>
     </div>
     <script>
@@ -116,11 +133,27 @@ HTML_TEMPLATE = """
             }
         }
 
+        async function sendToArduino() {
+            try {
+                const response = await fetch('/send-to-arduino', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                if (data.message) {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error("Error sending data to Arduino:", error);
+                alert("Error sending data to Arduino.");
+            }
+        }
+
         setInterval(fetchRecognizedText, 2000);
         fetchRecognizedText();
     </script>
 </body>
 </html>
+
 """
 
 @app.route('/')
@@ -146,11 +179,22 @@ def send_to_arduino():
     if arduino:
         try:
             arduino.write(recognized_text.encode('utf-8'))
-            return jsonify({"message": "Data sent to Arduino successfully!"}), 200
+            print(f"Sent recognized text to Arduino: {recognized_text}")
+            return jsonify({
+                "message": "Data sent to Arduino successfully!",
+                "sent_text": recognized_text
+            }), 200
         except serial.SerialException as e:
-            return jsonify({"message": "Failed to send data to Arduino", "error": str(e)}), 500
+            print(f"Failed to send data to Arduino: {e}")
+            return jsonify({
+                "message": "Failed to send data to Arduino.",
+                "error": str(e)
+            }), 500
     else:
-        return jsonify({"message": "Arduino is not connected"}), 500
+        print("Arduino is not connected.")
+        return jsonify({
+            "message": "Arduino is not connected."
+        }), 500
 
 # Start ngrok
 public_url = ngrok.connect(5000)
